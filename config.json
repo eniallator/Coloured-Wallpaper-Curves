@@ -1,83 +1,67 @@
 [
     {
-        "id": "example-checkbox",
-        "label": "Example Checkbox",
-        "type": "checkbox",
-        "tooltip": "Example tooltip",
-        "default": true
-    },
-    {
-        "id": "example-range",
-        "label": "Example Range",
+        "id": "blend",
+        "label": "Blend Strength",
         "type": "range",
-        "default": 5,
+        "default": 0.1,
+        "attrs": {
+            "min": 0,
+            "max": 1,
+            "step": 0.05
+        }
+    },
+    {
+        "id": "spread",
+        "label": "Colour spread strength",
+        "type": "range",
+        "default": 3,
         "attrs": {
             "min": 1,
-            "max": 10,
-            "step": 0.5
+            "max": 20,
+            "step": 0.1
         }
     },
     {
-        "id": "example-number",
-        "label": "Example Number",
-        "type": "number",
-        "default": 5,
-        "attrs": {
-            "min": 1,
-            "max": 10
-        }
-    },
-    {
-        "id": "example-colour",
-        "label": "Example Colour",
-        "type": "color",
-        "default": "FF5A5F"
-    },
-    {
-        "id": "example-button",
-        "text": "Example Button",
-        "type": "button"
-    },
-    {
-        "id": "example-text",
-        "label": "Example Text",
-        "type": "text",
-        "default": "Hello",
-        "attrs": {
-            "placeholder": "World!"
-        }
-    },
-    {
-        "id": "example-collection",
-        "label": "Example Collection",
+        "id": "colours",
+        "label": "Colours",
         "type": "collection",
         "expandable": true,
         "fields": [
             {
-                "label": "Example Range Field",
-                "type": "range",
+                "label": "Colour",
+                "type": "color",
                 "initial": 2,
                 "attrs": {
                     "min": 0,
                     "max": 4,
                     "step": 1
                 }
-            },
-            {
-                "label": "Example Checkbox Field",
-                "type": "checkbox",
-                "initial": false
             }
         ],
         "default": [
             [
-                4,
-                true
+                "E70000"
             ],
             [
-                1,
-                false
+                "FF8C00"
+            ],
+            [
+                "FFEF00"
+            ],
+            [
+                "00811F"
+            ],
+            [
+                "0044FF"
+            ],
+            [
+                "760089"
             ]
         ]
+    },
+    {
+        "id": "redraw",
+        "text": "Redraw",
+        "type": "button"
     }
 ]

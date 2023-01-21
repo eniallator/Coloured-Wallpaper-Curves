@@ -73,90 +73,49 @@ function draw() {
       );
     }
 
-    let r = tf.zeros(shape);
-    let g = tf.zeros(shape);
-    let b = tf.zeros(shape);
+    const colourChannels = new Array(3).fill().map(() => tf.zeros(shape));
 
     for (let i = 0; i < colours.length; i++) {
-      r = r.where(colourIndices.notEqual(i + 1), colours[i][0]);
-      g = g.where(colourIndices.notEqual(i + 1), colours[i][1]);
-      b = b.where(colourIndices.notEqual(i + 1), colours[i][2]);
+      for (let j = 0; j < colourChannels.length; j++) {
+        colourChannels[j] = colourChannels[j].where(
+          colourIndices.notEqual(i + 1),
+          colours[i][j]
+        );
+      }
     }
 
-    r = r
-      .pad(
-        [
-          [blendSideLength / 2, 0],
-          [blendSideLength / 2, 0],
-          [0, 0],
-        ],
-        colours[0][0]
-      )
-      .pad(
-        [
-          [0, blendSideLength / 2],
-          [0, blendSideLength / 2],
-          [0, 0],
-        ],
-        colours[colours.length - 1][0]
-      )
-      .conv2d(
-        tf.ones([blendSideLength + 1, blendSideLength + 1, 1, 1]),
-        1,
-        "valid"
-      )
-      .div(blendSideLength ** 2)
-      .minimum(tf.ones([1]));
-    g = g
-      .pad(
-        [
-          [blendSideLength / 2, 0],
-          [blendSideLength / 2, 0],
-          [0, 0],
-        ],
-        colours[0][1]
-      )
-      .pad(
-        [
-          [0, blendSideLength / 2],
-          [0, blendSideLength / 2],
-          [0, 0],
-        ],
-        colours[colours.length - 1][1]
-      )
-      .conv2d(
-        tf.ones([blendSideLength + 1, blendSideLength + 1, 1, 1]),
-        1,
-        "valid"
-      )
-      .div(blendSideLength ** 2)
-      .minimum(tf.ones([1]));
-    b = b
-      .pad(
-        [
-          [blendSideLength / 2, 0],
-          [blendSideLength / 2, 0],
-          [0, 0],
-        ],
-        colours[0][2]
-      )
-      .pad(
-        [
-          [0, blendSideLength / 2],
-          [0, blendSideLength / 2],
-          [0, 0],
-        ],
-        colours[colours.length - 1][2]
-      )
-      .conv2d(
-        tf.ones([blendSideLength + 1, blendSideLength + 1, 1, 1]),
-        1,
-        "valid"
-      )
-      .div(blendSideLength ** 2)
-      .minimum(tf.ones([1]));
+    if (blendSideLength > 1) {
+      for (let i = 0; i < colourChannels.length; i++) {
+        colourChannels[i] = colourChannels[i]
+          .pad(
+            [
+              [blendSideLength / 2, 0],
+              [blendSideLength / 2, 0],
+              [0, 0],
+            ],
+            colours[0][i]
+          )
+          .pad(
+            [
+              [0, blendSideLength / 2],
+              [0, blendSideLength / 2],
+              [0, 0],
+            ],
+            colours[colours.length - 1][i]
+          )
+          .conv2d(
+            tf.ones([blendSideLength + 1, blendSideLength + 1, 1, 1]),
+            1,
+            "valid"
+          )
+          .div(blendSideLength ** 2)
+          .minimum(tf.ones([1]));
+      }
+    }
 
-    return tf.keep(tf.stack([r, g, b], 2).reshape([shape[0], shape[1], 3]));
+    return tf.keep(
+      tf.stack(colourChannels, -1).reshape([shape[0], shape[1], 3])
+    );
   });
 
   tf.browser.toPixels(pixels, canvas);

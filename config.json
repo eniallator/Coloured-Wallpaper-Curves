@@ -11,8 +11,32 @@
         }
     },
     {
+        "id": "width",
+        "label": "Width Override",
+        "type": "number",
+        "tooltip": "Set to 0 to use the viewport width",
+        "default": 0,
+        "attrs": {
+            "min": 0,
+            "max": 5000,
+            "step": 1
+        }
+    },
+    {
+        "id": "height",
+        "label": "Height Override",
+        "type": "number",
+        "tooltip": "Set to 0 to use the viewport height",
+        "default": 0,
+        "attrs": {
+            "min": 0,
+            "max": 5000,
+            "step": 1
+        }
+    },
+    {
         "id": "spread",
-        "label": "Colour spread strength",
+        "label": "Colour Spread Strength",
         "type": "range",
         "default": 3,
         "attrs": {

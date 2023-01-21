@@ -34,10 +34,16 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const colours = paramConfig.getVal("colours").map((arr) => hexToRGB(arr[0]));
-  const shape = [canvas.height, canvas.width, 1];
+  const cfgWidth = paramConfig.getVal("width");
+  const cfgHeight = paramConfig.getVal("height");
+  const shape = [
+    cfgHeight === 0 ? canvas.height : cfgHeight,
+    cfgWidth === 0 ? canvas.width : cfgWidth,
+    1,
+  ];
 
   let blendSideLength = Math.floor(
-    paramConfig.getVal("blend") * Math.min(canvas.width, canvas.height) * 0.2
+    paramConfig.getVal("blend") * Math.min(shape[0], shape[1]) * 0.2
   );
   blendSideLength = blendSideLength + (blendSideLength % 2);
 

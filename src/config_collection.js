@@ -134,10 +134,11 @@ class ConfigCollection {
     });
 
     const rowHtmlOutput = html.find("tbody");
-    for (let i in initialOverride ?? this.#cfgData.default) {
+    const data = initialOverride ?? this.#cfgData.default;
+    for (let i in data) {
       let initial;
       const rowItem = {
-        fields: this.#cfgData.default[i].map((val, j) => ({
+        fields: data[i].map((val, j) => ({
           val: (initial = initialOverride?.[i]?.[j])
             ? this.#fieldTypes[j].deserialise(initial, this.#shortUrl)
             : val,

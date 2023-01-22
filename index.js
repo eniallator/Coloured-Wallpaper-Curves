@@ -65,14 +65,14 @@ function draw() {
 
     let colourIndices = tf.zeros(shape);
     for (let i = 0; i < colours.length; i++) {
-      // Created here: https://www.desmos.com/calculator/bsei7grt6h
+      // Created here: https://www.desmos.com/calculator/lydvgmw5jz
       colourIndices = colourIndices.where(
         xCoords
           .sub(0.5)
           .pow(3)
           .mul(4)
           .add(0.5)
-          .pow((paramConfig.getVal("spread") * i) / colours.length)
+          .pow(Math.log((i + 1) / colours.length) / Math.log(1 / 2))
           .less(yCoords),
         colourIndices.add(1)
       );

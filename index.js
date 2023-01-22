@@ -20,8 +20,12 @@ function hexToRGB(hex) {
 }
 
 window.onresize = (evt) => {
-  canvas.width = $("#canvas").width();
-  canvas.height = $("#canvas").height();
+  const cfgWidth = paramConfig.loaded && paramConfig.getVal("width");
+  const cfgHeight = paramConfig.loaded && paramConfig.getVal("height");
+  canvas.classList.toggle("full-width", (cfgWidth ?? 0) === 0);
+  canvas.classList.toggle("full-height", (cfgHeight ?? 0) === 0);
+  canvas.width = cfgWidth || $("#canvas").width();
+  canvas.height = cfgHeight || $("#canvas").height();
 };
 window.onresize();
 
@@ -31,16 +35,11 @@ ctx.strokeStyle = "white";
 let pixels;
 
 function draw() {
+  window.onresize();
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const colours = paramConfig.getVal("colours").map((arr) => hexToRGB(arr[0]));
-  const cfgWidth = paramConfig.getVal("width");
-  const cfgHeight = paramConfig.getVal("height");
-  const shape = [
-    cfgHeight === 0 ? canvas.height : cfgHeight,
-    cfgWidth === 0 ? canvas.width : cfgWidth,
-    1,
-  ];
+  const shape = [canvas.height, canvas.width, 1];
 
   let blendSideLength = Math.floor(
     paramConfig.getVal("blend") * Math.min(shape[0], shape[1]) * 0.2
@@ -116,6 +115,23 @@ function draw() {
           )
           .div(blendSideLength ** 2)
           .minimum(tf.ones([1]));
+      }
+    }
+
+    const borderSize = paramConfig.getVal("border-size");
+    const borderMax = paramConfig.getVal("border-max");
+    if (borderSize > 0) {
+      const xBorders = tf.minimum(
+        xCoords.div(borderSize).add(borderMax).minimum(1),
+        tf.ones(shape).sub(xCoords).div(borderSize).add(borderMax).minimum(1)
+      );
+      const yBorders = tf.minimum(
+        yCoords.div(borderSize).add(borderMax).minimum(1),
+        tf.ones(shape).sub(yCoords).div(borderSize).add(borderMax).minimum(1)
+      );
+      const borders = xBorders.minimum(yBorders);
+      for (let i = 0; i < colourChannels.length; i++) {
+        colourChannels[i] = colourChannels[i].mul(borders);
       }
     }
 

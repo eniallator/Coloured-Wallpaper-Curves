@@ -52,24 +52,32 @@ function draw() {
       .reshape(shape)
       .div(shape[0]);
 
-    let colourIndices = tf.zeros(shape);
     const spread = paramConfig.getVal("spread");
-    for (let i = 0; i < colours.length - 1; i++) {
-      // Created here: https://www.desmos.com/calculator/4txy20rwzy
-      colourIndices = colourIndices.where(
-        xCoords
-          .sub(0.5)
-          .pow(3)
-          .mul(4)
-          .add(0.5)
-          .pow(
-            Math.log((spread * (i + 1)) / colours.length + (1 - spread) / 2) /
-              Math.log(1 / 2)
+    const colourIndices = tf.tidy(() => {
+      let colourIndices = tf.zeros(shape);
+      for (let i = 0; i < colours.length - 1; i++) {
+        // Created here: https://www.desmos.com/calculator/4txy20rwzy
+        colourIndices = tf.tidy(() =>
+          tf.keep(
+            colourIndices.where(
+              xCoords
+                .sub(0.5)
+                .pow(3)
+                .mul(4)
+                .add(0.5)
+                .pow(
+                  Math.log(
+                    (spread * (i + 1)) / colours.length + (1 - spread) / 2
+                  ) / Math.log(1 / 2)
+                )
+                .less(yCoords),
+              colourIndices.add(1)
+            )
           )
-          .less(yCoords),
-        colourIndices.add(1)
-      );
-    }
+        );
+      }
+      return tf.keep(colourIndices);
+    });
 
     const colourChannels = new Array(3).fill().map(() => tf.zeros(shape));
 

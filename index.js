@@ -53,15 +53,19 @@ function draw() {
       .div(shape[0]);
 
     let colourIndices = tf.zeros(shape);
-    for (let i = 0; i < colours.length; i++) {
-      // Created here: https://www.desmos.com/calculator/lydvgmw5jz
+    const spread = paramConfig.getVal("spread");
+    for (let i = 0; i < colours.length - 1; i++) {
+      // Created here: https://www.desmos.com/calculator/4txy20rwzy
       colourIndices = colourIndices.where(
         xCoords
           .sub(0.5)
           .pow(3)
           .mul(4)
           .add(0.5)
-          .pow(Math.log((i + 1) / colours.length) / Math.log(1 / 2))
+          .pow(
+            Math.log((spread * (i + 1)) / colours.length + (1 - spread) / 2) /
+              Math.log(1 / 2)
+          )
           .less(yCoords),
         colourIndices.add(1)
       );
@@ -72,7 +76,7 @@ function draw() {
     for (let i = 0; i < colours.length; i++) {
       for (let j = 0; j < colourChannels.length; j++) {
         colourChannels[j] = colourChannels[j].where(
-          colourIndices.notEqual(i + 1),
+          colourIndices.notEqual(i),
           colours[i][j]
         );
       }

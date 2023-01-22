@@ -19,23 +19,12 @@ function hexToRGB(hex) {
   ];
 }
 
-window.onresize = (evt) => {
-  const cfgWidth = paramConfig.loaded && paramConfig.getVal("width");
-  const cfgHeight = paramConfig.loaded && paramConfig.getVal("height");
-  canvas.classList.toggle("full-width", (cfgWidth ?? 0) === 0);
-  canvas.classList.toggle("full-height", (cfgHeight ?? 0) === 0);
-  canvas.width = cfgWidth || $("#canvas").width();
-  canvas.height = cfgHeight || $("#canvas").height();
-};
-window.onresize();
-
 ctx.fillStyle = "black";
 ctx.strokeStyle = "white";
 
 let pixels;
 
 function draw() {
-  window.onresize();
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const colours = paramConfig.getVal("colours").map((arr) => hexToRGB(arr[0]));
@@ -143,6 +132,16 @@ function draw() {
   tf.browser.toPixels(pixels, canvas);
 }
 
-paramConfig.addListener(draw, ["redraw"]);
+window.onresize = (evt) => {
+  const cfgWidth = paramConfig.loaded && paramConfig.getVal("width");
+  const cfgHeight = paramConfig.loaded && paramConfig.getVal("height");
+  canvas.classList.toggle("full-width", (cfgWidth ?? 0) === 0);
+  canvas.classList.toggle("full-height", (cfgHeight ?? 0) === 0);
+  canvas.width = cfgWidth || $("#canvas").width();
+  canvas.height = cfgHeight || $("#canvas").height();
+  draw();
+};
 
-paramConfig.onLoad(draw);
+paramConfig.addListener(window.onresize, ["redraw"]);
+
+paramConfig.onLoad(window.onresize);

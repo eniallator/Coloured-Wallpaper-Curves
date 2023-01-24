@@ -37,6 +37,19 @@
     {
         "id": "blend",
         "label": "Blend Strength",
+        "tooltip": "Warning: Makes it much slower to generate",
+        "type": "range",
+        "default": 0,
+        "attrs": {
+            "min": 0,
+            "max": 1,
+            "step": 0.05
+        }
+    },
+    {
+        "id": "shadow-size",
+        "label": "Shaded Shadow Size",
+        "tooltip": "Warning: Makes it much slower to generate",
         "type": "range",
         "default": 0,
         "attrs": {
@@ -49,7 +62,7 @@
         "id": "border-size",
         "label": "Border Size",
         "type": "range",
-        "default": 0.25,
+        "default": 0.2,
         "attrs": {
             "min": 0,
             "max": 0.5,

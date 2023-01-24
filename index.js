@@ -34,6 +34,12 @@ function draw() {
     paramConfig.getVal("blend") * Math.min(shape[0], shape[1]) * 0.2
   );
   blendSideLength = blendSideLength + (blendSideLength % 2);
+  let shadingFilterSideLength = Math.floor(
+    paramConfig.getVal("shadow-size") * Math.min(shape[0], shape[1]) * 0.1
+  );
+  shadingFilterSideLength =
+    shadingFilterSideLength + (shadingFilterSideLength % 2) + 1;
+  console.log(shadingFilterSideLength);
 
   if (pixels != null) {
     pixels.dispose();
@@ -116,6 +122,66 @@ function draw() {
           )
           .div(blendSideLength ** 2)
           .minimum(tf.ones([1]));
+      }
+    }
+
+    if (shadingFilterSideLength > 1) {
+      const shading = tf.tidy(() => {
+        let shaded = tf.zeros(shape);
+        const xCoords = tf
+          .range(0, shadingFilterSideLength)
+          .sub((shadingFilterSideLength - 1) / 2)
+          .tile([shadingFilterSideLength])
+          .reshape([shadingFilterSideLength, shadingFilterSideLength]);
+        const xyCoords = xCoords.add(
+          xCoords.transpose().reshape(xCoords.shape)
+        );
+        const rotatedXyCoords = xCoords
+          .sub(xCoords.transpose().reshape(xCoords.shape))
+          .abs();
+        const filter = xyCoords
+          .where(xyCoords.equal(0), xyCoords.div(xyCoords.abs()))
+          .mul(
+            tf
+              .sub(shadingFilterSideLength, xyCoords.abs())
+              .where(
+                xyCoords.abs().greater(rotatedXyCoords.abs()),
+                tf.sub(shadingFilterSideLength, rotatedXyCoords.abs())
+              )
+          )
+          .reshape([shadingFilterSideLength, shadingFilterSideLength, 1, 1]);
+        const filterMaxValue = filter.abs().sum().div(2);
+        const paddedIndices = colourIndices
+          .pad(
+            [
+              [(shadingFilterSideLength - 1) / 2, 0],
+              [(shadingFilterSideLength - 1) / 2, 0],
+              [0, 0],
+            ],
+            0
+          )
+          .pad(
+            [
+              [0, (shadingFilterSideLength - 1) / 2],
+              [0, (shadingFilterSideLength - 1) / 2],
+              [0, 0],
+            ],
+            colours.length - 1
+          );
+        for (let i = 0; i < colours.length; i++) {
+          shaded = shaded.add(
+            paddedIndices
+              .equal(i)
+              .cast(paddedIndices.dtype)
+              .conv2d(filter, 1, "valid")
+              .div(filterMaxValue)
+              .where(colourIndices.equal(i), tf.zeros(shape))
+          );
+        }
+        return tf.keep(shaded.add(2).div(2));
+      });
+      for (let i = 0; i < colourChannels.length; i++) {
+        colourChannels[i] = colourChannels[i].mul(shading).minimum(1);
       }
     }
 

@@ -8,6 +8,18 @@ const paramConfig = new ParamConfig(
 );
 paramConfig.addCopyToClipboardHandler("#share-btn");
 
+document.getElementById("download-btn").onclick = function (_evt) {
+  const url = canvas.toDataURL();
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `${
+    document.getElementsByTagName("title")?.[0].innerText ?? "download"
+  }.png`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+};
+
 function hexToRGB(hex) {
   const match = hex
     .toUpperCase()
